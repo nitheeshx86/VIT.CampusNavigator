@@ -1,0 +1,309 @@
+/* ===================================
+   CSS RESET & BASE STYLES
+   =================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow: hidden;
+    /* Prevent page scrolling */
+}
+
+/* ===================================
+   MAP CONTAINER
+   =================================== */
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* ===================================
+   UI CONTROLS
+   =================================== */
+.controls {
+    position: absolute;
+    bottom: 140px;
+    right: 16px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-btn {
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #4285f4;
+}
+
+.control-btn:hover {
+    background: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.control-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ===================================
+   LOADING INDICATOR
+   =================================== */
+.loading {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #333;
+}
+
+.loading.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #4285f4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===================================
+   CUSTOM MARKER STYLES
+   =================================== */
+/* Category colors defined via Leaflet DivIcon in JS */
+.marker-academic {
+    background-color: #4285f4;
+    border: 2px solid #ffffff;
+}
+
+.marker-hostel {
+    background-color: #34a853;
+    border: 2px solid #ffffff;
+}
+
+.marker-emergency {
+    background-color: #ea4335;
+    border: 2px solid #ffffff;
+}
+
+/* ===================================
+   CUSTOM POPUP STYLES
+   =================================== */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 200px;
+}
+
+.leaflet-popup-close-button {
+    color: #333 !important;
+    padding: 8px !important;
+}
+
+.popup-content {
+    padding: 16px;
+}
+
+.popup-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.popup-category {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.popup-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.navigate-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: #4285f4;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    /* Touch-friendly minimum size */
+    min-height: 44px;
+}
+
+.navigate-btn:hover {
+    background: #357ae8;
+}
+
+.navigate-btn:active {
+    background: #2a66c7;
+    transform: scale(0.98);
+}
+
+/* ===================================
+   ROUTING PANEL CUSTOMIZATION
+   =================================== */
+.leaflet-routing-container {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-routing-alt {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.leaflet-routing-alt:last-child {
+    border-bottom: none;
+}
+
+/* ===================================
+   USER LOCATION MARKER
+   =================================== */
+.user-location-marker {
+    width: 16px;
+    height: 16px;
+    background: #4285f4;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-accuracy-circle {
+    fill: #4285f4;
+    fill-opacity: 0.1;
+    stroke: #4285f4;
+    stroke-opacity: 0.3;
+    stroke-width: 1;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 768px) {
+    .controls {
+        bottom: 120px;
+        right: 12px;
+    }
+
+    .control-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .loading {
+        top: 12px;
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+
+    .leaflet-routing-container {
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .popup-content {
+        padding: 12px;
+    }
+
+    .popup-title {
+        font-size: 14px;
+    }
+
+    .popup-description {
+        font-size: 13px;
+    }
+
+    .navigate-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+.control-btn:focus,
+.navigate-btn:focus {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+
+    .control-btn,
+    .loading {
+        border: 2px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
