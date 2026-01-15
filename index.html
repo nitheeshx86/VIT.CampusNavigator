@@ -1,31 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Campus Navigation - Find your way around campus with real-time GPS navigation">
+    <meta name="description"
+        content="VIT Chennai Campus Navigator - Find your way around campus with custom SVG map navigation">
     <meta name="theme-color" content="#4285f4">
-    <title>Campus Navigator</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-    
+    <title>VIT Chennai Campus Navigator</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-    <!-- Map Container -->
-    <div id="map"></div>
-    
+    <!-- Header -->
+    <header class="header">
+        <h1>VIT Chennai</h1>
+        <p id="current-location">Locating you...</p>
+    </header>
+
+    <!-- Destination Selector -->
+    <div class="destination-bar">
+        <select id="destination-select">
+            <option value="">Select destination...</option>
+        </select>
+        <button id="clear-btn" class="icon-btn" title="Clear Route">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Map Container (SVG loaded inline to support file:// protocol) -->
+    <div id="map-container">
+        <div id="svg-wrapper">
+            <svg id="campus-map" width="700" height="840" viewBox="0 0 700 840" fill="none"
+                xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <!-- ========================================
+                   CAMPUS BUILDINGS (class="block")
+                   ======================================== -->
+
+                <!-- Hostels & Residential -->
+                <rect id="block_d2_hostel" class="block" x="216" y="626" width="22" height="33" fill="#CD4E4E" />
+                <rect id="block_b_hostel" class="block" x="283" y="597" width="32" height="43" fill="#CD4E4E" />
+                <rect id="block_c_hostel" class="block" x="283" y="546" width="32" height="43" fill="#CD4E4E" />
+                <rect id="block_e_hostel" class="block" x="431" y="488" width="36" height="54" fill="#CD4E4E" />
+                <rect id="block_health_centre" class="block" x="371" y="623" width="65" height="36" fill="#CD4E4E" />
+
+                <!-- Academic Blocks -->
+                <rect id="block_ab5" class="block" x="556" y="466" width="43" height="26" fill="#CD4E4E" />
+                <rect id="block_dominos" class="block" x="439" y="465" width="16" height="14" fill="#CD4E4E" />
+                <rect id="block_ab2_north" class="block" x="556" y="391" width="58" height="55" fill="#CD4E4E" />
+                <rect id="block_ab2_south" class="block" x="556" y="293" width="58" height="58" fill="#CD4E4E" />
+
+                <!-- Rotated Buildings -->
+                <rect id="block_sigma" class="block" x="367.241" y="205" width="44.5573" height="28.388"
+                    transform="rotate(30.1101 367.241 205)" fill="#CD4E4E" />
+                <rect id="block_vmart" class="block" x="334.657" y="186.62" width="31.3605" height="28.388"
+                    transform="rotate(30.1101 334.657 186.62)" fill="#CD4E4E" />
+
+                <!-- Entrance Area Buildings -->
+                <rect id="block_main_gate" class="block" x="82" y="325.611" width="66.6131" height="48.0713"
+                    transform="rotate(-89.5362 82 325.611)" fill="#CD4E4E" />
+                <rect id="block_admin" class="block" x="117" y="396.801" width="59.8032" height="24.5546"
+                    transform="rotate(-89.5362 117 396.801)" fill="#CD4E4E" />
+                <rect id="block_library" class="block" x="212" y="364.071" width="54.0731" height="73.0508"
+                    transform="rotate(-89.5362 212 364.071)" fill="#CD4E4E" />
+                <rect id="block_gazebo" class="block" x="323" y="356.864" width="26.8647" height="22.8949"
+                    transform="rotate(-89.5362 323 356.864)" fill="#CD4E4E" />
+
+                <!-- MG Auditorium -->
+                <rect id="block_mg_auditorium" class="block" x="347.983" y="361.381" width="73.2121" height="41.1762"
+                    transform="rotate(-69.6573 347.983 361.381)" fill="#CD4E4E" />
+
+                <!-- Complex Buildings -->
+                <path id="block_ab1" class="block"
+                    d="M484.206 423.078L484 321.08L523.794 321L524 422.997L484.206 423.078Z" fill="#CD4E4E" />
+                <path id="block_ab3" class="block"
+                    d="M422.168 371.367L445.668 307.612L394.668 288.612L408.668 263.112L467.168 297.112L451.168 368.612L422.168 371.367Z"
+                    fill="#CD4E4E" />
+
+                <!-- Guest House Area -->
+                <rect id="block_guest_house" class="block" x="146" y="216.77" width="97.6075" height="62.7793"
+                    transform="rotate(-25.3368 146 216.77)" fill="#CD4E4E" />
+
+                <!-- A Block Hostel -->
+                <rect id="block_a_hostel" class="block" x="142" y="489.415" width="32" height="43"
+                    transform="rotate(-42.0062 142 489.415)" fill="#CD4E4E" />
+
+                <!-- North Square -->
+                <path id="block_north_square" class="block"
+                    d="M324.187 492.549C324.668 492.196 323.675 476.669 323.675 476.669L408.411 453.069L410.911 464.569C372.728 493.163 323.706 492.902 324.187 492.549Z"
+                    fill="#CD4E4E" />
+
+                <!-- D1 Hostel -->
+                <rect id="block_d1_hostel" class="block" x="142" y="489.415" width="32" height="43"
+                    transform="rotate(-42.0062 142 489.415)" fill="#CD4E4E" />
+
+                <!-- ========================================
+                   CAMPUS ROADS (class="road")
+                   ======================================== -->
+
+                <!-- Main Spine Road (Entrance to Center) -->
+                <path id="road_entrance_to_library" class="road" d="M255.5 665.5L257 585.5H245L243.5 665.5H255.5Z"
+                    fill="#B1B1B1" stroke="black" />
+                <path id="road_library_junction_east" class="road"
+                    d="M256.32 598.036L307.053 598.825L306.885 586.827L256.152 586.037L256.32 598.036Z" fill="#B1B1B1"
+                    stroke="black" />
+                <path id="road_central_junction" class="road"
+                    d="M306.168 598.71L356.901 599.499L356.733 587.5L306 586.711L306.168 598.71Z" fill="#B1B1B1"
+                    stroke="black" />
+                <path id="road_center_north" class="road"
+                    d="M344 512.234L344 514.697L344 586.5L355.988 587.032L355.988 515.644L355.988 512.766L344 512.234Z"
+                    fill="#B1B1B1" />
+
+                <!-- Main Campus Loop -->
+                <path id="road_main_loop" class="road"
+                    d="M344 514.697L344 512.234L355.988 512.766L355.988 515.644L360.5 516L368.5 514.5L377 512.234L392.5 505.5L388 497L381.5 499.5L371 502.5L365 503.5L358 505.5L350.5 505.5L341.5 505.5L333.5 505.5L325 503.5L317 501.5L312 499.5L306.5 491.5L301.5 491.5L297 491.5L295.5 494.5L292 499.5L289.5 499.5L284.5 499.5L277.5 499.5L268.5 499.5L257 499.5L249.5 498L244 497L241 501.5L240 504.5L241 507.5L244 507.5L259.5 508.5L295.5 508.5L300 511L305 511L308 508.5L310 507.5L317 511L326.5 512.766L337 514.5L341.5 514.5L344 514.697Z"
+                    fill="#B1B1B1" />
+                <path id="road_main_loop_outline" class="road"
+                    d="M344 514.697L344 512.234L355.988 512.766L355.988 515.644M344 514.697L341.5 514.5L337 514.5L326.5 512.766L317 511L310 507.5L308 508.5L305 511L300 511L295.5 508.5L259.5 508.5L244 507.5L241 507.5L240 504.5L241 501.5L244 497L249.5 498L257 499.5L268.5 499.5L277.5 499.5L284.5 499.5L289.5 499.5L292 499.5L295.5 494.5L297 491.5L301.5 491.5L306.5 491.5L312 499.5L317 501.5L325 503.5L333.5 505.5L341.5 505.5L350.5 505.5L358 505.5L365 503.5L371 502.5L381.5 499.5L388 497L392.5 505.5L377 512.234L368.5 514.5L360.5 516L355.988 515.644M344 514.697L355.988 515.644M344 514.697L344 586.5L355.988 587.032L355.988 515.644"
+                    stroke="black" />
+
+                <!-- Health Centre Road -->
+                <path id="road_health_to_bblock" class="road"
+                    d="M345.5 617.287L416.668 617.288L416.5 605.289L356 605.289L356 599.5L345.5 599.5L345.5 617.287Z"
+                    fill="#B1B1B1" stroke="black" />
+
+                <!-- Eastern Roads (to AB5 area) -->
+                <path id="road_aavin" class="road"
+                    d="M382 511L392.5 524L421 554L424.5 556.5H450.5H469V545H430L392.5 506L382 511Z" fill="#D9D9D9"
+                    stroke="black" />
+                <path id="road_ab3_to_north_square" class="road"
+                    d="M389.5 497.5L393.5 504L407.5 497.5L414 491L420 483.5L426.5 476L432.5 466.5V463.5L429 454L423 463.5L420 470L414 476L405.5 483.5L398 491L389.5 494.5L387.5 497.5H389.5Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- AB5 Access Road -->
+                <path id="road_gazebo_to_ab5" class="road" d="M436.376 463H618V454H429L436.376 463Z" fill="#D9D9D9"
+                    stroke="black" />
+
+                <!-- AB2 North-South Connector -->
+                <path id="road_bblock_to_cblock" class="road"
+                    d="M538.668 400L538.668 454.097L548.996 453.969L548.328 400L538.668 400Z" fill="#D9D9D9"
+                    stroke="black" />
+                <path id="road_ab2_connector_north" class="road"
+                    d="M537.669 287L537.669 399.097L547.997 398.969L547.997 287L537.669 287Z" fill="#D9D9D9"
+                    stroke="black" />
+
+                <!-- Western Roads (Entrance area) -->
+                <path id="road_entrance_west" class="road"
+                    d="M238.5 506.5L211.5 495.5L201 488.5L188 477.5L175 467.5L171 460L159.5 440.5L168 436L175 444.5L180.5 452L188 460L195.5 467.5L211.5 477.5L228.5 488.5L238.5 495.5V506.5Z"
+                    fill="#D9D9D9" stroke="black" />
+                <path id="road_gate_to_admin" class="road"
+                    d="M160 441.5L147 418V406.5L144.5 390V378.5L147 361L150.5 345.5L156.5 328.5L163.5 315.5L173 323L160 352V365L156.5 382V402.5L167 432.5V435.5L160 441.5Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- Library Area Roads -->
+                <path id="road_admin_to_library" class="road"
+                    d="M160.5 412L264.5 412.786V398.286L156.5 399.5L160.5 412Z" fill="#D9D9D9" stroke="black" />
+                <path id="road_library_to_gazebo" class="road" d="M265.5 413H334.5V398H265.5V413Z" fill="#D9D9D9"
+                    stroke="black" />
+
+                <!-- Central North Road -->
+                <path id="road_gazebo_to_ab3" class="road"
+                    d="M306 311.5L306 397L321 397.029L321.165 311.5L316 305L316 257.5L309.5 257.5L309.5 305L306 311.5Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- Guest House Access -->
+                <path id="road_to_guest_house" class="road"
+                    d="M173 322L182.5 306L191 298L202 288.5L214.5 279.5L224 275L237.5 269.5L249 267L262.5 263L255.5 252L237.5 257L214.5 267L191 281.5L173 298L164 313.5L173 322Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- Northern Ring Road -->
+                <path id="road_north_ring" class="road"
+                    d="M264.5 262.5L279.5 257L294.5 254.5H312.5L329 257L347.5 259H374.5L390 262.5H412.5L439.5 267.5L456.5 272L479 276.5L502 281.5L525.5 286L537 288.5H549.5L548.5 280L523 272L503.5 268.5L468.5 262.5L456.5 259L439.5 257L422.5 254.5H407.5H390L384 252.5L370.5 250.5H350.5L333 247L312.5 244H294.5L279.5 247L256.5 252.5L261.5 262.5H264.5Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- AB1 Access Road -->
+                <path id="road_aavin_to_ab2" class="road" d="M469 275V455.5H481V275H469Z" fill="#D9D9D9"
+                    stroke="black" />
+
+                <!-- Small Connector -->
+                <path id="road_small_connector" class="road" d="M260.5 499V411.5H263.5V499H260.5Z" fill="#D9D9D9"
+                    stroke="black" />
+
+                <!-- Curved AB3 Connector -->
+                <path id="road_ab3_curve" class="road"
+                    d="M440 454L436 445L430 434L418 428L392.5 424L349 418L323 414L325 409L354 414L372.5 416.5L382 418L394.5 419.5L409 422L421 424L428.5 428L436 434L440 440.5L442.5 448L445 454H440Z"
+                    fill="#D9D9D9" stroke="black" />
+
+                <!-- South Connector Road -->
+                <path id="road_south_connector" class="road" d="M244.025 586.5H255L258 508.5L246 507L244.025 586.5Z"
+                    fill="#D9D9D9" />
+                <path id="road_south_connector_outline" class="road"
+                    d="M244 586.5H244.025M244 587.5L244.025 586.5M244.025 586.5H255L258 508.5L246 507L244.025 586.5Z"
+                    stroke="black" />
+            </svg>
+        </div>
+    </div>
+
     <!-- UI Controls -->
     <div class="controls">
-        <button id="locate-btn" class="control-btn" title="My Location">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="zoom-in-btn" class="control-btn" title="Zoom In">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+        <button id="zoom-out-btn" class="control-btn" title="Zoom Out">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+        <button id="locate-btn" class="control-btn primary" title="My Location">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="2" x2="12" y2="4"></line>
@@ -35,24 +234,39 @@
             </svg>
         </button>
     </div>
-    
+
     <!-- Loading Indicator -->
     <div id="loading" class="loading">
         <div class="spinner"></div>
         <p>Getting your location...</p>
     </div>
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    
-    <!-- Leaflet Routing Machine JS -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    
-    <!-- Application Scripts - Load in order: data → map → routing -->
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-item">
+            <span class="legend-dot current"></span>
+            <span>Your location</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot destination"></span>
+            <span>Destination</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-line"></span>
+            <span>Route</span>
+        </div>
+    </div>
+
+    <!-- Directions Panel -->
+    <div id="directions-panel" class="directions-panel hidden">
+        <h3>Directions</h3>
+        <ul id="directions-list"></ul>
+    </div>
+
+    <!-- Application Scripts -->
     <script src="js/data.js"></script>
+    <script src="js/navigation.js"></script>
     <script src="js/map.js"></script>
-    <script src="js/routing.js"></script>
 </body>
+
 </html>

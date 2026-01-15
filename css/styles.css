@@ -1,6 +1,29 @@
 /* ===================================
-   CSS RESET & BASE STYLES
+   CSS VARIABLES & RESET
    =================================== */
+:root {
+    --primary: #4285f4;
+    --primary-dark: #1a73e8;
+    --success: #34a853;
+    --warning: #ff9800;
+    --danger: #ea4335;
+    --white: #ffffff;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f4;
+    --gray-200: #e8eaed;
+    --gray-300: #dadce0;
+    --gray-600: #5f6368;
+    --gray-800: #3c4043;
+    --gray-900: #202124;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -10,58 +33,247 @@
 html,
 body {
     height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: var(--font);
+    background: var(--gray-100);
     overflow: hidden;
-    /* Prevent page scrolling */
+    color: var(--gray-900);
+}
+
+/* ===================================
+   HEADER
+   =================================== */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--white);
+    padding: 12px 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.header #current-location {
+    font-size: 12px;
+    color: var(--gray-600);
+    max-width: 50%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* ===================================
+   DESTINATION BAR
+   =================================== */
+.destination-bar {
+    position: fixed;
+    top: 60px;
+    left: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+}
+
+.destination-bar select {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: var(--font);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    color: var(--gray-900);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6368' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.destination-bar select:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.icon-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: var(--gray-50);
+    color: var(--gray-900);
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
 }
 
 /* ===================================
    MAP CONTAINER
    =================================== */
-#map {
+#map-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
-    z-index: 1;
+    height: 100%;
+    background: var(--gray-200);
+    overflow: hidden;
+    cursor: grab;
+}
+
+#svg-wrapper {
+    transform-origin: 0 0;
+    transition: transform 0.1s ease-out;
+}
+
+#campus-map {
+    display: block;
+}
+
+/* ===================================
+   SVG BLOCK STYLES (Buildings)
+   =================================== */
+.block {
+    fill: #CD4E4E;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.block:hover {
+    fill: #ff7070;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Current location (where user is near) */
+.block.active.current {
+    fill: var(--primary);
+    stroke: var(--white);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 12px var(--primary));
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Destination building */
+.block.active.destination {
+    fill: var(--success);
+    stroke: var(--white);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 12px var(--success));
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* ===================================
+   SVG ROAD STYLES
+   =================================== */
+.road {
+    fill: #D9D9D9;
+    stroke: #999;
+    stroke-width: 1;
+    transition: all 0.3s ease;
+}
+
+/* Active route road */
+.road.active {
+    fill: var(--primary) !important;
+    stroke: var(--primary-dark) !important;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 4px var(--primary));
+    animation: routeGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes routeGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px var(--primary));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 8px var(--primary));
+    }
 }
 
 /* ===================================
    UI CONTROLS
    =================================== */
 .controls {
-    position: absolute;
-    bottom: 140px;
+    position: fixed;
+    bottom: 100px;
     right: 16px;
-    z-index: 1000;
+    z-index: 100;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .control-btn {
     width: 48px;
     height: 48px;
-    background: #ffffff;
+    background: var(--white);
     border: none;
     border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-md);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--gray-600);
     transition: all 0.2s ease;
-    color: #4285f4;
 }
 
 .control-btn:hover {
-    background: #f8f9fa;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: var(--gray-50);
+    box-shadow: var(--shadow-lg);
+    color: var(--gray-900);
 }
 
 .control-btn:active {
     transform: scale(0.95);
+}
+
+.control-btn.primary {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.control-btn.primary:hover {
+    background: var(--primary-dark);
 }
 
 .control-btn svg {
@@ -73,20 +285,20 @@ body {
    LOADING INDICATOR
    =================================== */
 .loading {
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: 130px;
     left: 50%;
     transform: translateX(-50%);
-    background: #ffffff;
+    background: var(--white);
     padding: 16px 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
     z-index: 1000;
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 14px;
-    color: #333;
+    color: var(--gray-800);
 }
 
 .loading.hidden {
@@ -96,188 +308,132 @@ body {
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #4285f4;
+    border: 2px solid var(--gray-200);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
+    to {
         transform: rotate(360deg);
     }
 }
 
 /* ===================================
-   CUSTOM MARKER STYLES
+   LEGEND
    =================================== */
-/* Category colors defined via Leaflet DivIcon in JS */
-.marker-academic {
-    background-color: #4285f4;
-    border: 2px solid #ffffff;
-}
-
-.marker-hostel {
-    background-color: #34a853;
-    border: 2px solid #ffffff;
-}
-
-.marker-emergency {
-    background-color: #ea4335;
-    border: 2px solid #ffffff;
-}
-
-/* ===================================
-   CUSTOM POPUP STYLES
-   =================================== */
-.leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    padding: 0;
-    overflow: hidden;
-}
-
-.leaflet-popup-content {
-    margin: 0;
-    min-width: 200px;
-}
-
-.leaflet-popup-close-button {
-    color: #333 !important;
-    padding: 8px !important;
-}
-
-.popup-content {
-    padding: 16px;
-}
-
-.popup-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.popup-category {
-    font-size: 12px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
-}
-
-.popup-description {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 12px;
-    line-height: 1.4;
-}
-
-.navigate-btn {
-    width: 100%;
+.legend {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    background: var(--white);
     padding: 12px 16px;
-    background: #4285f4;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    /* Touch-friendly minimum size */
-    min-height: 44px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
 }
 
-.navigate-btn:hover {
-    background: #357ae8;
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray-600);
 }
 
-.navigate-btn:active {
-    background: #2a66c7;
-    transform: scale(0.98);
-}
-
-/* ===================================
-   ROUTING PANEL CUSTOMIZATION
-   =================================== */
-.leaflet-routing-container {
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.leaflet-routing-alt {
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.leaflet-routing-alt:last-child {
-    border-bottom: none;
-}
-
-/* ===================================
-   USER LOCATION MARKER
-   =================================== */
-.user-location-marker {
-    width: 16px;
-    height: 16px;
-    background: #4285f4;
-    border: 3px solid #ffffff;
+.legend-dot {
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.user-accuracy-circle {
-    fill: #4285f4;
-    fill-opacity: 0.1;
-    stroke: #4285f4;
-    stroke-opacity: 0.3;
-    stroke-width: 1;
+.legend-dot.current {
+    background: var(--primary);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3);
+}
+
+.legend-dot.destination {
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.3);
+}
+
+.legend-line {
+    width: 20px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+/* ===================================
+   NOTIFICATION ANIMATIONS
+   =================================== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
 }
 
 /* ===================================
    RESPONSIVE DESIGN
    =================================== */
-@media (max-width: 768px) {
-    .controls {
-        bottom: 120px;
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 12px;
+    }
+
+    .header h1 {
+        font-size: 16px;
+    }
+
+    .destination-bar {
+        top: 52px;
+        left: 12px;
         right: 12px;
     }
 
-    .control-btn {
+    .destination-bar select {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .controls {
+        bottom: 90px;
+        right: 12px;
+    }
+
+    .control-btn,
+    .icon-btn {
         width: 44px;
         height: 44px;
     }
 
-    .loading {
-        top: 12px;
-        padding: 12px 20px;
-        font-size: 13px;
-    }
-
-    .leaflet-routing-container {
-        max-width: 90vw;
-    }
-}
-
-@media (max-width: 480px) {
-    .popup-content {
-        padding: 12px;
-    }
-
-    .popup-title {
-        font-size: 14px;
-    }
-
-    .popup-description {
-        font-size: 13px;
-    }
-
-    .navigate-btn {
-        padding: 10px 14px;
-        font-size: 13px;
+    .legend {
+        bottom: 12px;
+        left: 12px;
+        padding: 10px 12px;
+        gap: 12px;
+        font-size: 11px;
     }
 }
 
@@ -285,25 +441,140 @@ body {
    ACCESSIBILITY
    =================================== */
 .control-btn:focus,
-.navigate-btn:focus {
-    outline: 2px solid #4285f4;
+.icon-btn:focus,
+select:focus {
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-
-    .control-btn,
-    .loading {
-        border: 2px solid #000;
-    }
-}
-
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+
+    .control-btn,
+    .icon-btn,
+    .legend,
+    .loading {
+        border: 2px solid var(--gray-900);
+    }
+}
+
+/* ===================================
+   DIRECTIONS PANEL
+   =================================== */
+.directions-panel {
+    position: fixed;
+    bottom: 80px;
+    /* Above legend */
+    left: 16px;
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    width: 280px;
+    max-height: 40vh;
+    overflow-y: auto;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.directions-panel.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    display: block !important;
+    /* Keep it in DOM for transitions */
+}
+
+.directions-panel h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #202124;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#directions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#directions-list li {
+    position: relative;
+    padding: 8px 0 8px 24px;
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.4;
+    border-left: 2px solid #e0e0e0;
+}
+
+#directions-list li::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+}
+
+#directions-list li:first-child::before {
+    border-color: #4285f4;
+    /* Current Location Color */
+    background: #4285f4;
+}
+
+#directions-list li:last-child::before {
+    border-color: #ea4335;
+    /* Destination Color */
+    background: #ea4335;
+}
+
+#directions-list li:last-child {
+    border-left: 2px solid transparent;
+}
+
+#directions-list li strong {
+    color: #202124;
+    display: block;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+#directions-list li .road-info {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+/* Mobile Tweaks */
+@media (max-width: 600px) {
+    .directions-panel {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 2000;
+        /* Above everything */
     }
 }
